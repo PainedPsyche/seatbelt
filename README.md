@@ -1,5 +1,14 @@
 # Seatbelt
 
+Adds togglable seatbelts to most vehicles.
+
+### My changes:
+
+- Removed all graphical user interface.
+- Added export functions that allow usage with custom HUDs.
+
+### Original readme contents:
+
 Script for FiveM. Possible prevent death in a crash.
 
 Installing:
