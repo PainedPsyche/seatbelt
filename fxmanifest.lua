@@ -10,7 +10,11 @@ client_scripts {
 ui_page 'html/ui.html'
 
 files {
-	'html/*',
+	'html/app.js',
+	'html/style.css',
+	'html/ui.html',
 	'html/img/seatbelt.png',
-	'html/sounds/*.ogg'
+	'html/sounds/buckle.ogg',
+	'html/sounds/seatbelt.ogg',
+	'html/sounds/unbuckle.ogg',
 }
