@@ -7,14 +7,15 @@ client_scripts {
 	'config.lua'
 }
 
-ui_page 'html/ui.html'
+ui_page 'ui/index.html'
 
 files {
-	'html/app.js',
-	'html/style.css',
-	'html/ui.html',
-	'html/img/seatbelt.png',
-	'html/sounds/buckle.ogg',
-	'html/sounds/seatbelt.ogg',
-	'html/sounds/unbuckle.ogg',
+	'ui/index.html',
+	'ui/sounds/buckle.ogg',
+	'ui/sounds/unbuckle.ogg',
+}
+
+exports {
+	'IsSeatbeltAvailable',
+	'IsSeatbeltOn'
 }

@@ -1,10 +1,16 @@
---- "Ramsus" ---
-
-local isUiOpen = false 
 local speedBuffer = {}
 local velBuffer = {}
+
 local SeatbeltON = false
 local InVehicle = false
+
+function IsSeatbeltAvailable()
+  return InVehicle
+end
+
+function IsSeatbeltOn()
+  return SeatbeltON
+end
 
 function Notify(string)
   SetNotificationTextEntry("STRING")
@@ -33,20 +39,14 @@ function Fwv(entity)
 end
  
 Citizen.CreateThread(function()
-	while true do
-	Citizen.Wait(0)
+  while true do
+    Citizen.Wait(0)
   
     local ped = PlayerPedId()
     local car = GetVehiclePedIsIn(ped)
 
     if car ~= 0 and (InVehicle or IsCar(car)) then
       InVehicle = true
-          if isUiOpen == false and not IsPlayerDead(PlayerId()) then
-            if Config.Blinker then
-              SendNUIMessage({displayWindow = 'true'})
-            end
-              isUiOpen = true
-          end
 
       if SeatbeltON then 
         DisableControlAction(0, 75, true)  -- Disable exit vehicle when stop
@@ -64,86 +64,37 @@ Citizen.CreateThread(function()
         Citizen.Wait(1)
         SetPedToRagdoll(ped, 1000, 1000, 0, 0, 0, 0)
       end
-        
+
       velBuffer[2] = velBuffer[1]
       velBuffer[1] = GetEntityVelocity(car)
         
       if IsControlJustReleased(0, Config.Control) and GetLastInputMethod(0) then
-          SeatbeltON = not SeatbeltON 
-          if SeatbeltON then
+        SeatbeltON = not SeatbeltON 
+        if SeatbeltON then
           Citizen.Wait(1)
 
-            if Config.Sounds then  
+          if Config.Sounds then  
             TriggerEvent("seatbelt:sounds", "buckle", Config.Volume)
-            end
-            if Config.Notification then
-            Notify(Config.Strings.seatbelt_on)
-            end
-            
-            if Config.Blinker then
-            SendNUIMessage({displayWindow = 'false'})
-            end
-            isUiOpen = true 
-          else 
-            if Config.Notification then
-            Notify(Config.Strings.seatbelt_off)
-            end
-
-            if Config.Sounds then
-            TriggerEvent("seatbelt:sounds", "unbuckle", Config.Volume)
-            end
-
-            if Config.Blinker then
-            SendNUIMessage({displayWindow = 'true'})
-            end
-            isUiOpen = true  
           end
-    end
-      
+          if Config.Notification then
+            Notify(Config.Strings.seatbelt_on)
+          end
+
+        else
+          if Config.Notification then
+            Notify(Config.Strings.seatbelt_off)
+          end
+
+          if Config.Sounds then
+            TriggerEvent("seatbelt:sounds", "unbuckle", Config.Volume)
+          end
+
+        end
+      end
     elseif InVehicle then
       InVehicle = false
       SeatbeltON = false
       speedBuffer[1], speedBuffer[2] = 0.0, 0.0
-          if isUiOpen == true and not IsPlayerDead(PlayerId()) then
-            if Config.Blinker then
-              SendNUIMessage({displayWindow = 'false'})
-            end
-            isUiOpen = false 
-          end
     end
   end
-end)
-
-Citizen.CreateThread(function()
-  while true do
-    Citizen.Wait(10)
-    local Vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
-    local VehSpeed = GetEntitySpeed(Vehicle) * 3.6
-
-    if Config.AlarmOnlySpeed and VehSpeed > Config.AlarmSpeed then
-      ShowWindow = true
-    else
-      ShowWindow = false
-      SendNUIMessage({displayWindow = 'false'})
-    end
-
-      if IsPlayerDead(PlayerId()) or IsPauseMenuActive() then
-        if isUiOpen == true then
-          SendNUIMessage({displayWindow = 'false'})
-        end
-        elseif not SeatbeltON and InVehicle and not IsPauseMenuActive() and not IsPlayerDead(PlayerId()) and Config.Blinker then
-          if Config.AlarmOnlySpeed and ShowWindow and VehSpeed > Config.AlarmSpeed then
-            SendNUIMessage({displayWindow = 'true'})
-          end
-      end
-  end
-end)
-
-Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(3500)
-    if not SeatbeltON and InVehicle and not IsPauseMenuActive() and Config.LoopSound and ShowWindow then
-      TriggerEvent("seatbelt:sounds", "seatbelt", Config.Volume)
-		end    
-	end
 end)
